@@ -61,9 +61,11 @@ def persian_greeting(hour: int) -> str:
         return "☀️ ✦ ظهر بخیر ✦"
     return "🌙 ✦ شب بخیر ✦"
 
+from datetime import timezone
+
 async def build_bio() -> str:
     """ساخت متن بیو"""
-    now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now_utc = datetime.now(timezone.utc)
     now = now_utc.astimezone(TEHRAN_TZ)
     time_str = now.strftime("%H:%M:%S")
     jnow = jdatetime.datetime.fromgregorian(datetime=now)
@@ -106,18 +108,27 @@ async def main():
 def index():
     return "Bio updater is running..."
 
-if __name__ == "__main__":
-    # Run Flask to keep server alive
-    import threading
-    port = int(os.environ.get('PORT', 5000))
-    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=port, use_reloader=False)).start()
-
+def run_telethon_client():
+    """Wrapper to run the Telethon client in a separate thread."""
+    print("🚀 Starting Telethon client in a background thread...")
+    # Create a new event loop for the new thread
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\n🛑 Stopped by user")
-    except Exception:
-        import sys
+        loop.run_until_complete(main())
+    except Exception as e:
+        print(f"❌ Error in Telethon client thread: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+
+if __name__ == "__main__":
+    # Start the Telethon client in a background thread
+    import threading
+    telethon_thread = threading.Thread(target=run_telethon_client)
+    telethon_thread.daemon = True  # Allows main thread to exit even if this thread is running
+    telethon_thread.start()
+
+    # Run Flask app in the main thread (as expected by Render)
+    print("🚀 Starting Flask server in the main thread...")
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, use_reloader=False)
