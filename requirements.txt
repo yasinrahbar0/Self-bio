@@ -1,0 +1,5 @@
+telethon
+jdatetime
+pytz
+python-dotenv
+flask
