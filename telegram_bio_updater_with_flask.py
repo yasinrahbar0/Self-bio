@@ -24,7 +24,7 @@ PERSIAN_MONTHS = [
     "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
 ]
 PERSIAN_WEEKDAYS = [
-    "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه", "شنبه"
+    "شنبه", "یک‌شنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"
 ]
 
 def get_greeting(hour):
@@ -38,12 +38,11 @@ def get_greeting(hour):
 async def build_bio():
     now = datetime.now(TEHRAN_TZ)
     jnow = jdatetime.datetime.fromgregorian(datetime=now)
-    time_str = now.strftime("🕒 %H:%M:%S")
     date_str = f"📅 {jnow.year}/{jnow.month:02d}/{jnow.day:02d}"
     month_name = f"🌙 {PERSIAN_MONTHS[jnow.month - 1]}"
     weekday_name = f"📆 {PERSIAN_WEEKDAYS[jnow.weekday()]}"
     greeting = get_greeting(now.hour)
-    return f"{time_str} | {date_str} | {month_name} | {weekday_name} | {greeting}"
+    return f"{date_str} | {month_name} | {weekday_name} | {greeting}"
 
 async def update_bio():
     session = StringSession(SESSION_STRING)
