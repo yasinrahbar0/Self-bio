@@ -3,3 +3,4 @@ jdatetime
 pytz
 python-dotenv
 flask
+requests
