@@ -7,7 +7,7 @@ from telethon import TelegramClient, functions
 from telethon.sessions import StringSession
 import jdatetime
 from dotenv import load_dotenv
-from flask import Flask
+from keep_alive import keep_alive
 
 # بارگذاری متغیرها
 load_dotenv()
@@ -58,19 +58,6 @@ async def update_bio():
             print("⚠️ Error updating bio:", e)
         await asyncio.sleep(60)
 
-# اجرای همزمان Flask و updater
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "🟢 Telegram Bio Updater is running!"
-
-def start_asyncio_loop():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(update_bio())
-
 if __name__ == '__main__':
-    import threading
-    threading.Thread(target=start_asyncio_loop).start()
-    app.run(host="0.0.0.0", port=10000)
+    keep_alive()
+    asyncio.run(update_bio())
